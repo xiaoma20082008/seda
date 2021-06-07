@@ -3,9 +3,10 @@ package org.seda.standard;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import java.util.Comparator;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.PriorityBlockingQueue;
 import org.seda.EventData;
 import org.seda.EventKey;
 import org.seda.Stage;
@@ -16,13 +17,16 @@ public class MemoryStageController implements StageController {
       .build(new CacheLoader<>() {
         @Override
         public BlockingQueue<EventData> load(Stage stage) {
-          return new LinkedBlockingQueue<>();
+          return new PriorityBlockingQueue<>(1024, Comparator.comparingLong(EventData::getId));
         }
       });
 
   @Override
   public EventData await(Stage stage, EventKey key) throws InterruptedException {
     try {
+      if (stage.isSelect() && cache.getIfPresent(Stage.SELECT) == null) {
+        initSelect();
+      }
       return cache.get(stage).take();
     } catch (ExecutionException e) {
       throw new InterruptedException(e.getMessage());
@@ -50,7 +54,7 @@ public class MemoryStageController implements StageController {
           break;
         }
         case LOAD: {
-          cache.get(Stage.SELECT).offer(data);
+          cache.get(Stage.SELECT).offer(new EventData());
           r = true;
           break;
         }
@@ -61,4 +65,7 @@ public class MemoryStageController implements StageController {
     }
   }
 
+  private void initSelect() throws ExecutionException {
+    cache.get(Stage.SELECT).offer(new EventData());
+  }
 }

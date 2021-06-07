@@ -12,8 +12,8 @@ public class MemoryEventSelect implements StandardEventSelect {
   private long idx = 0;
 
   @Override
-  public EventData await(EventKey key) {
-    EventData data = new EventData();
+  public EventData await(EventKey key) throws InterruptedException {
+    EventData data = stageController.await(Stage.SELECT, key);
     data.setKey(key);
     data.setId(++idx);
     return data;

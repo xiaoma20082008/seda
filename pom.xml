@@ -4,9 +4,10 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.example</groupId>
+  <groupId>org.seda</groupId>
   <artifactId>seda</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0.0-SNAPSHOT</version>
+  <name>seda</name>
 
   <properties>
     <maven.compiler.source>11</maven.compiler.source>
@@ -16,6 +17,12 @@
     <log4j.version>2.14.1</log4j.version>
     <junit.version>4.13.2</junit.version>
   </properties>
+
+  <scm>
+    <url>https://github.com/xiaoma20082008/seda.git</url>
+    <connection>scm:git:https://github.com/xiaoma20082008/seda.git</connection>
+    <developerConnection>scm:git:https://github.com/xiaoma20082008/seda.git</developerConnection>
+  </scm>
 
   <build>
     <pluginManagement>

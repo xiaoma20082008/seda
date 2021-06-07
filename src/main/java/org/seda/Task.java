@@ -1,5 +1,6 @@
 package org.seda;
 
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -11,13 +12,13 @@ import lombok.Setter;
 public abstract class Task extends Thread implements AutoCloseable {
 
   protected final EventKey key;
-  protected final ThreadPoolExecutor executor;
-  protected volatile boolean started;
-
-  protected int coreSize = 64;
-  protected int maxSize = 128;
+  protected ExecutorService executor;
+  protected int coreSize = Runtime.getRuntime().availableProcessors();
+  protected int maxSize = coreSize << 1;
   protected int waitingBuffer = 10240;
   protected int keepaliveTime = 60 * 1000;
+
+  protected volatile boolean running;
 
   public Task(EventKey key) {
     this.key = key;
@@ -38,35 +39,16 @@ public abstract class Task extends Thread implements AutoCloseable {
   }
 
   @Override
-  public final void run() {
-    while (started) {
-      try {
-        doCall();
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
-    }
-  }
-
-  @Override
   public void close() {
-    this.started = true;
+    this.running = false;
+    this.executor.shutdown();
   }
-
-  @Override
-  public final synchronized void start() {
-    this.started = true;
-    super.start();
-  }
-
-  protected abstract void doCall() throws InterruptedException;
 
   protected void randomSleep() {
-    int times = (int) (Math.random() * 1000 + 1000);
+    int times = (int) (Math.random() * 10 + 10);
     try {
       Thread.sleep(times);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
+    } catch (InterruptedException ignore) {
     }
   }
 
