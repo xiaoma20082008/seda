@@ -1,10 +1,8 @@
 package org.seda.standard;
 
-import lombok.extern.slf4j.Slf4j;
 import org.seda.EventData;
 import org.seda.EventKey;
 
-@Slf4j
 public class StandardTaskExtract extends StandardTask {
 
   public StandardTaskExtract(EventKey key) {
@@ -18,14 +16,12 @@ public class StandardTaskExtract extends StandardTask {
     while (running) {
       try {
         EventData data = eventService.extractEvent().await(key);
-        log.info("Extract await");
         executor.submit(() -> {
-          randomSleep();
+          doSomething();
           eventService.extractEvent().signal(data);
-          log.info("Extract signal");
         });
       } catch (InterruptedException ex) {
-        log.info("ExtractTask Interrupted");
+        logger.info("ExtractTask Interrupted");
         break;
       }
 

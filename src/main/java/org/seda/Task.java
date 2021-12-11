@@ -7,10 +7,13 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Setter
 public abstract class Task extends Thread implements AutoCloseable {
 
+  protected final Logger logger = LoggerFactory.getLogger(getClass());
   protected final EventKey key;
   protected ExecutorService executor;
   protected int coreSize = Runtime.getRuntime().availableProcessors();
@@ -24,7 +27,7 @@ public abstract class Task extends Thread implements AutoCloseable {
     this.key = key;
     setName(getClass().getSimpleName());
     this.executor = new ThreadPoolExecutor(coreSize, maxSize, keepaliveTime, TimeUnit.MILLISECONDS,
-        new LinkedBlockingQueue<>(), new ThreadFactory() {
+        new LinkedBlockingQueue<>(10240), new ThreadFactory() {
       private final AtomicInteger index = new AtomicInteger(1);
 
       @Override
@@ -44,11 +47,16 @@ public abstract class Task extends Thread implements AutoCloseable {
     this.executor.shutdown();
   }
 
-  protected void randomSleep() {
+  protected void doSomething() {
     int times = (int) (Math.random() * 10 + 10);
+    String oldName = Thread.currentThread().getName();
+    Thread.currentThread().setName(getClass().getSimpleName().substring("StandardTask".length()));
     try {
       Thread.sleep(times);
+      logger.info("execute task cost {}ms", times);
     } catch (InterruptedException ignore) {
+    } finally {
+      Thread.currentThread().setName(oldName);
     }
   }
 
