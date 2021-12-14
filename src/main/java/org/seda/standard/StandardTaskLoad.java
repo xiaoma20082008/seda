@@ -17,7 +17,7 @@ public class StandardTaskLoad extends StandardTask {
       try {
         EventData data = eventService.loadEvent().await(key);
         executor.submit(() -> {
-          doSomething();
+          doSomething(data);
           eventService.loadEvent().signal(data);
         });
       } catch (InterruptedException ex) {

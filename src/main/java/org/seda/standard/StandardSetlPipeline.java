@@ -43,4 +43,7 @@ public class StandardSetlPipeline extends SetlPipelineBase {
     return ((StandardTaskSelect) selectTask).getCount();
   }
 
+  public int getSelectIndex() {
+    return ((StandardTaskSelect) selectTask).getIndex();
+  }
 }

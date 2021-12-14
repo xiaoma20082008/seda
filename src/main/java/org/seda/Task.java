@@ -47,13 +47,14 @@ public abstract class Task extends Thread implements AutoCloseable {
     this.executor.shutdown();
   }
 
-  protected void doSomething() {
+  protected void doSomething(EventData data) {
     int times = (int) (Math.random() * 10 + 10);
     String oldName = Thread.currentThread().getName();
-    Thread.currentThread().setName(getClass().getSimpleName().substring("StandardTask".length()));
+    String newName = getClass().getSimpleName().substring("StandardTask".length());
+    Thread.currentThread().setName(newName);
     try {
       Thread.sleep(times);
-      logger.info("execute task cost {}ms", times);
+      logger.info("{} execute task cost {}ms", newName, times);
     } catch (InterruptedException ignore) {
     } finally {
       Thread.currentThread().setName(oldName);

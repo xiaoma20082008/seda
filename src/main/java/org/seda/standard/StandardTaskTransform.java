@@ -17,7 +17,7 @@ public class StandardTaskTransform extends StandardTask {
       try {
         EventData data = eventService.transformEvent().await(key);
         executor.submit(() -> {
-          doSomething();
+          doSomething(data);
           eventService.transformEvent().signal(data);
         });
       } catch (InterruptedException ex) {

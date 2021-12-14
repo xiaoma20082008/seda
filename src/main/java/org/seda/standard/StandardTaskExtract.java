@@ -17,7 +17,7 @@ public class StandardTaskExtract extends StandardTask {
       try {
         EventData data = eventService.extractEvent().await(key);
         executor.submit(() -> {
-          doSomething();
+          doSomething(data);
           eventService.extractEvent().signal(data);
         });
       } catch (InterruptedException ex) {
